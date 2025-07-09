@@ -17,3 +17,4 @@ dependencyResolutionManagement {
 rootProject.name = "WeatherApp"
 include(":androidApp")
 include(":shared")
+include(":shared:kotlin")
