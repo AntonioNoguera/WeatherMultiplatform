@@ -10,19 +10,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import domain.models.Weather
 import org.koin.androidx.compose.koinViewModel
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherScreen(
     viewModel: WeatherViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    WeatherScreenContent(
+        uiState = uiState,
+        onSearchWeather = viewModel::searchWeather,
+        onClearError = viewModel::clearError
+    )
+}
+
+@Composable
+fun WeatherScreenContent(
+    uiState: WeatherUiState,
+    onSearchWeather: (String) -> Unit = {},
+    onClearError: () -> Unit = {}
+) {
     var cityInput by remember { mutableStateOf("") }
 
     Column(
@@ -31,7 +43,6 @@ fun WeatherScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Text(
             text = "🌤️ Weather App",
             fontSize = 28.sp,
@@ -47,7 +58,7 @@ fun WeatherScreen(
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(
-                onSearch = { viewModel.searchWeather(cityInput.trim()) }
+                onSearch = { onSearchWeather(cityInput.trim()) }
             ),
             modifier = Modifier.fillMaxWidth()
         )
@@ -55,7 +66,7 @@ fun WeatherScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { viewModel.searchWeather(cityInput.trim()) },
+            onClick = { onSearchWeather(cityInput.trim()) },
             enabled = cityInput.isNotBlank() && !uiState.isLoading,
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -65,8 +76,9 @@ fun WeatherScreen(
                     strokeWidth = 2.dp
                 )
                 Spacer(modifier = Modifier.width(8.dp))
+            } else {
+                Text("Buscar")
             }
-            Text("Buscar")
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -75,7 +87,7 @@ fun WeatherScreen(
             uiState.error != null -> {
                 ErrorCard(
                     error = uiState.error!!,
-                    onDismiss = { viewModel.clearError() }
+                    onDismiss = onClearError
                 )
             }
             uiState.weather != null -> {
@@ -167,7 +179,6 @@ fun WeatherCard(weather: Weather) {
                     label = "Humedad",
                     value = "${weather.humidity}%"
                 )
-
                 WeatherDetail(
                     icon = "💨",
                     label = "Viento",
@@ -195,4 +206,22 @@ fun WeatherDetail(icon: String, label: String, value: String) {
             fontWeight = FontWeight.Medium
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MyPreviews() {
+    WeatherScreenContent(
+        uiState = WeatherUiState(
+            isLoading = false,
+            error = null,
+            weather = Weather(
+                cityName = "Barcelona",
+                temperature = 24.0,
+                description = "cielo despejado",
+                humidity = 60,
+                windSpeed = 10.0
+            )
+        )
+    )
 }
