@@ -1,31 +1,24 @@
-package com.weather.app.android.presentation
+package presentation.viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import domain.models.Weather
 import domain.useCases.GetWeatherUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
-data class WeatherUiState(
-    val weather: Weather? = null,
-    val isLoading: Boolean = false,
-    val error: String? = null
-)
+import presentation.BaseViewModel
+import presentation.ui_state.WeatherUiState
 
 class WeatherViewModel(
     private val getWeatherUseCase: GetWeatherUseCase
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(WeatherUiState())
-    val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<WeatherUiState> = _uiState
 
     fun searchWeather(cityName: String) {
         if (cityName.isBlank()) return
 
-        viewModelScope.launch {
+        launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
             getWeatherUseCase(cityName)
@@ -34,7 +27,7 @@ class WeatherViewModel(
                 }
                 .onFailure { exception ->
                     _uiState.value = WeatherUiState(
-                        error = exception.message ?: "Error desconocido"
+                        error = exception.message ?: "Unknown error"
                     )
                 }
         }

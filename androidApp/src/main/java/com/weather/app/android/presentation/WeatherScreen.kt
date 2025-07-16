@@ -13,15 +13,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import domain.models.Weather
-import org.koin.androidx.compose.koinViewModel
+import presentation.viewmodel.WeatherUiState
+import presentation.viewmodel.WeatherViewModel
+import org.koin.compose.koinInject
+
 
 @Composable
-fun WeatherScreen(
-    viewModel: WeatherViewModel = koinViewModel()
-) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+fun WeatherScreen( ) {
+
+    val viewModel: WeatherViewModel = koinInject()
+    val uiState = viewModel.uiState.collectAsState().value
+
     WeatherScreenContent(
         uiState = uiState,
         onSearchWeather = viewModel::searchWeather,
