@@ -1,13 +1,24 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
 
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.21"
+    id("co.touchlab.skie") version "0.9.0"
 }
 
+
+
 kotlin {
+
+    // Para suprimir warnings de expect/actual
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpected-actual-classes")
+    }
+
     androidTarget {
         compilations.all {
             compileTaskProvider.configure {
@@ -25,11 +36,20 @@ kotlin {
     ).forEach {
         it.binaries.framework {
             baseName = "shared"
-            isStatic = true
+            isStatic = false
+            export("co.touchlab:kermit:2.0.3")
         }
     }
 
     sourceSets {
+
+        all {
+            languageSettings.apply {
+                optIn("kotlin.RequiresOptIn")
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+            }
+        }
+
         commonMain.dependencies {
             // Networking
             implementation("io.ktor:ktor-client-core:2.3.7")
@@ -42,17 +62,28 @@ kotlin {
             // Serialization
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 
-            //DI
-            implementation("io.insert-koin:koin-core:3.5.3")
-        }
+            // DI
+            implementation("io.insert-koin:koin-core:3.5.6")
+
+            // SKIE annotations
+            implementation("co.touchlab.skie:configuration-annotations:0.10.1")
+ }
 
         androidMain.dependencies {
+            // Networking Android
             implementation("io.ktor:ktor-client-android:2.3.7")
-            implementation("io.insert-koin:koin-android:3.5.3")
+            implementation("io.insert-koin:koin-android:3.5.6")
+
+            // AndroidX ViewModel para heredar
+            implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
         }
 
         iosMain.dependencies {
             implementation("io.ktor:ktor-client-darwin:2.3.7")
+
+            // NUEVAS DEPENDENCIAS iOS
+            api("co.touchlab:kermit-simple:2.0.3")
+
         }
 
         commonTest.dependencies {

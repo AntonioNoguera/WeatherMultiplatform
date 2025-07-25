@@ -13,28 +13,38 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import domain.models.Weather
-import presentation.viewmodel.WeatherUiState
+import presentation.viewmodel.WeatherViewState
 import presentation.viewmodel.WeatherViewModel
 import org.koin.compose.koinInject
-
+import kotlinx.coroutines.launch
 
 @Composable
-fun WeatherScreen( ) {
-
+fun WeatherScreen() {
     val viewModel: WeatherViewModel = koinInject()
-    val uiState = viewModel.uiState.collectAsState().value
+    val uiState by viewModel.weatherState.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+
+    // Activar el ViewModel cuando se monte el composable
+    LaunchedEffect(viewModel) {
+        viewModel.activate()
+    }
 
     WeatherScreenContent(
         uiState = uiState,
-        onSearchWeather = viewModel::searchWeather,
+        onSearchWeather = { cityName ->
+            scope.launch {
+                viewModel.searchWeather(cityName)
+            }
+        },
         onClearError = viewModel::clearError
     )
 }
 
 @Composable
 fun WeatherScreenContent(
-    uiState: WeatherUiState,
+    uiState: WeatherViewState,
     onSearchWeather: (String) -> Unit = {},
     onClearError: () -> Unit = {}
 ) {
@@ -79,6 +89,7 @@ fun WeatherScreenContent(
                     strokeWidth = 2.dp
                 )
                 Spacer(modifier = Modifier.width(8.dp))
+                Text("Buscando...")
             } else {
                 Text("Buscar")
             }
@@ -86,21 +97,38 @@ fun WeatherScreenContent(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        when {
-            uiState.error != null -> {
-                ErrorCard(
-                    error = uiState.error!!,
-                    onDismiss = onClearError
-                )
-            }
-            uiState.weather != null -> {
-                WeatherCard(weather = uiState.weather!!)
-            }
-            else -> {
+        // Manejo de estados con sealed classes
+        when (uiState) {
+            is WeatherViewState.Initial -> {
                 Text(
                     text = "Ingresa el nombre de una ciudad",
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            is WeatherViewState.Loading -> {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator()
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Buscando información del clima...",
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            is WeatherViewState.Success -> {
+                WeatherCard(weather = uiState.weather)
+            }
+
+            is WeatherViewState.Error -> {
+                ErrorCard(
+                    error = uiState.error,
+                    onDismiss = onClearError
                 )
             }
         }
@@ -209,22 +237,4 @@ fun WeatherDetail(icon: String, label: String, value: String) {
             fontWeight = FontWeight.Medium
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MyPreviews() {
-    WeatherScreenContent(
-        uiState = WeatherUiState(
-            isLoading = false,
-            error = null,
-            weather = Weather(
-                cityName = "Barcelona",
-                temperature = 24.0,
-                description = "cielo despejado",
-                humidity = 60,
-                windSpeed = 10.0
-            )
-        )
-    )
 }

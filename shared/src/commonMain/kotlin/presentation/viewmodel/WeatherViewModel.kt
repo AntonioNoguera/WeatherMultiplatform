@@ -1,39 +1,69 @@
 package presentation.viewmodel
 
-import domain.models.Weather
+// commonMain/models/WeatherViewModel.kt
 import domain.useCases.GetWeatherUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import presentation.BaseViewModel
-import presentation.ui_state.WeatherUiState
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import presentation.ViewModel
 
 class WeatherViewModel(
     private val getWeatherUseCase: GetWeatherUseCase
-) : BaseViewModel() {
+) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(WeatherUiState())
-    val uiState: StateFlow<WeatherUiState> = _uiState
+    private val mutableWeatherState: MutableStateFlow<WeatherViewState> =
+        MutableStateFlow(WeatherViewState.Initial)
 
-    fun searchWeather(cityName: String) {
+    val weatherState: StateFlow<WeatherViewState> = mutableWeatherState.asStateFlow()
+
+    /**
+     * Activates this viewModel so that `weatherState` returns the current weather state.
+     */
+    suspend fun activate() {
+        // Si necesitas inicialización específica
+//        log.d("WeatherViewModel activated")
+    }
+
+    override fun onCleared() {
+//        log.v("Clearing WeatherViewModel")
+    }
+
+    suspend fun searchWeather(cityName: String) {
         if (cityName.isBlank()) return
 
-        launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+        mutableWeatherState.update { WeatherViewState.Loading() }
 
+        try {
             getWeatherUseCase(cityName)
                 .onSuccess { weather ->
-                    _uiState.value = WeatherUiState(weather = weather)
+                    mutableWeatherState.update {
+                        WeatherViewState.Success(weather = weather)
+                    }
                 }
                 .onFailure { exception ->
-                    _uiState.value = WeatherUiState(
-                        error = exception.message ?: "Unknown error"
-                    )
+                    handleWeatherError(exception)
                 }
+        } catch (exception: Exception) {
+            handleWeatherError(exception)
         }
     }
 
     fun clearError() {
-        _uiState.value = _uiState.value.copy(error = null)
+        mutableWeatherState.update { currentState ->
+            when (currentState) {
+                is WeatherViewState.Error -> WeatherViewState.Initial
+                else -> currentState
+            }
+        }
+    }
+
+    private fun handleWeatherError(throwable: Throwable) {
+//        log.e(throwable) { "Error getting weather data" }
+        mutableWeatherState.update {
+            WeatherViewState.Error(
+                error = throwable.message ?: "Unknown error occurred"
+            )
+        }
     }
 }

@@ -1,8 +1,14 @@
 package di
 
+import org.koin.core.component.KoinComponent
 import org.koin.dsl.module
+import presentation.viewmodel.WeatherViewModel
 
 actual val platformModule = module {
-    // Aquí van dependencias específicas de iOS
-    // Por ahora está vacío
+    single { WeatherViewModel(get()) }
+}
+
+@Suppress("unused")
+object KotlinDependencies : KoinComponent {
+    fun getWeatherViewModel() = getKoin().get<WeatherViewModel>()
 }
