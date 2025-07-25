@@ -32,7 +32,6 @@ fun initKoin(appModule: Module): KoinApplication {
 
 private val coreModule = module {
     // Network
-    single { HttpClientFactory.create() }
     single { WeatherAPI(get()) }
 
     // Repository

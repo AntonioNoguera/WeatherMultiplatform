@@ -72,6 +72,7 @@ kotlin {
         androidMain.dependencies {
             // Networking Android
             implementation("io.ktor:ktor-client-android:2.3.7")
+            implementation("io.ktor:ktor-client-okhttp:2.3.7")
             implementation("io.insert-koin:koin-android:3.5.6")
 
             // AndroidX ViewModel para heredar
