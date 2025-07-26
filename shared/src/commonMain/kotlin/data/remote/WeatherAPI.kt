@@ -11,14 +11,14 @@
     import kotlinx.serialization.json.Json
 
  class WeatherAPI(engine: HttpClientEngine) {
-        private val apiKey = "02be332837e16e0b93a5173d98a9f6cb" // Mover esto al secrets
+        private val apiKey = "02be332837e16e0b93a5173d98a9f6cb"
         private val baseUrl = "https://api.openweathermap.org/data/2.5"
 
         private val client = HttpClient(engine) {
             expectSuccess = true
             install(ContentNegotiation) {
                 json(Json {
-                    ignoreUnknownKeys = true //Para que el DTO decodifique los datos que le solicitamos.
+                    ignoreUnknownKeys = true //Para que el DTO decodifique solo los datos que le solicitamos.
                     prettyPrint = true
                     isLenient = true
                 })
@@ -33,12 +33,11 @@
         }
 
         suspend fun getCurrentWeather(cityName: String): WeatherResponse {
-
-
             return client.get("$baseUrl/weather") {
                 parameter("q", cityName)
                 parameter("appid", apiKey)
                 parameter("units", "metric")
+                parameter("lang","es")
             }.body()
         }
     }

@@ -1,7 +1,7 @@
 package data.respositories
 
-import data.mapper.toDomain
 import data.remote.WeatherAPI
+import data.remote.dto.toDomain
 import domain.models.Weather
 import domain.respositories.WeatherRepository
 

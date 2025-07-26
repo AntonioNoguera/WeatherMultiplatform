@@ -1,6 +1,7 @@
 package data.remote.dto
 
 
+import domain.models.Weather
 import kotlinx.serialization.SerialName;
 import kotlinx.serialization.Serializable;
 
@@ -28,3 +29,13 @@ data class WeatherData(
 data class WindData(
     @SerialName("speed") val speed: Double
 )
+
+fun WeatherResponse.toDomain(): Weather {
+    return Weather(
+        cityName = name,
+        temperature = main.temp,
+        description = weather.firstOrNull()?.description ?: "N/A",
+        humidity = main.humidity,
+        windSpeed = wind.speed
+    )
+}
