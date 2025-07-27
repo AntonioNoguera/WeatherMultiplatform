@@ -1,12 +1,12 @@
-package presentation.viewmodel
+package presentation.weather
 
 // commonMain/models/WeatherViewModel.kt
-import domain.useCases.GetWeatherUseCase
+import domain.weather.useCases.GetWeatherUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import presentation.ViewModel
+import presentation.core.ViewModel
 
 class WeatherViewModel(
     private val getWeatherUseCase: GetWeatherUseCase

@@ -96,7 +96,8 @@ struct WeatherCard: View {
                 .font(.system(size: 60, weight: .light))
                 .foregroundColor(.blue)
             
-            Text(weather.description.capitalized)
+            //Colisión con "description" nativo de Swift
+            Text(weather.description_.capitalized)
                 .font(.body)
                 .foregroundColor(.gray)
             

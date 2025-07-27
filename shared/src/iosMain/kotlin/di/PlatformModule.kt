@@ -4,7 +4,7 @@ import org.koin.core.component.KoinComponent
 
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import presentation.viewmodel.WeatherViewModel
+import presentation.weather.WeatherViewModel
 import io.ktor.client.engine.darwin.Darwin
 
 actual val platformModule: Module = module {

@@ -1,4 +1,4 @@
-package domain.models
+package domain.weather.models
 
 data class Weather(
     val cityName: String,

@@ -9,11 +9,8 @@ plugins {
     id("co.touchlab.skie") version "0.9.0"
 }
 
-
-
 kotlin {
 
-    // Para suprimir warnings de expect/actual
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
         freeCompilerArgs.add("-Xexpected-actual-classes")
@@ -29,11 +26,7 @@ kotlin {
         }
     }
     
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach {
+    listOf( iosX64(), iosArm64(), iosSimulatorArm64() ).forEach {
         it.binaries.framework {
             baseName = "shared"
             isStatic = false
@@ -91,6 +84,7 @@ kotlin {
             implementation(libs.kotlin.test)
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
             implementation("io.insert-koin:koin-test:3.5.3")
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
         }
     }
 }

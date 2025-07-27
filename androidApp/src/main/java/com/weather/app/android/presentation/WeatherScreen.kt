@@ -10,13 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import domain.models.Weather
-import presentation.viewmodel.WeatherViewState
-import presentation.viewmodel.WeatherViewModel
+import domain.weather.models.Weather
+import presentation.weather.WeatherViewState
+import presentation.weather.WeatherViewModel
 import org.koin.compose.koinInject
 import kotlinx.coroutines.launch
 

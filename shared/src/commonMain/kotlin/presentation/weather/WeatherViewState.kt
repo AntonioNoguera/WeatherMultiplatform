@@ -1,8 +1,8 @@
-package presentation.viewmodel
+package presentation.weather
 
 
 import co.touchlab.skie.configuration.annotations.DefaultArgumentInterop
-import domain.models.Weather
+import domain.weather.models.Weather
 
 sealed class WeatherViewState {
     abstract val isLoading: Boolean

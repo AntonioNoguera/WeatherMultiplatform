@@ -6,10 +6,10 @@ import org.koin.core.module.Module
 import org.koin.core.parameter.parametersOf
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
-import domain.useCases.GetWeatherUseCase
-import data.remote.WeatherAPI
-import data.respositories.WeatherRepositoryImpl
-import domain.respositories.WeatherRepository
+import domain.weather.useCases.GetWeatherUseCase
+import data.weather.WeatherAPI
+import data.weather.respositories.WeatherRepositoryImpl
+import domain.weather.respositories.WeatherRepository
 
 
 fun initKoin(appModule: Module): KoinApplication {

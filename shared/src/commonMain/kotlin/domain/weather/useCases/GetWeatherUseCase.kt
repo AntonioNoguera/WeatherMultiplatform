@@ -1,10 +1,10 @@
-package domain.useCases
+package domain.weather.useCases
 
-import domain.models.Weather
-import domain.respositories.WeatherRepository
+import domain.weather.models.Weather
+import domain.weather.respositories.WeatherRepository
 
 
-class GetWeatherUseCase( val repository: WeatherRepository ) {
+class GetWeatherUseCase( val repository: WeatherRepository) {
     suspend operator fun invoke(cityName: String): Result<Weather> {
         return try {
             val weather = repository.getCurrentWeather(cityName)

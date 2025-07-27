@@ -5,10 +5,9 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import di.initKoin
-import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import presentation.viewmodel.WeatherViewModel
+import presentation.weather.WeatherViewModel
 
 class WeatherApplication : Application() {
     override fun onCreate() {
