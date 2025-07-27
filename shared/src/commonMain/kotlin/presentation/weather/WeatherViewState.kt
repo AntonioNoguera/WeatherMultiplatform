@@ -1,6 +1,5 @@
 package presentation.weather
 
-
 import co.touchlab.skie.configuration.annotations.DefaultArgumentInterop
 import domain.weather.models.Weather
 

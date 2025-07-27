@@ -1,6 +1,5 @@
 package presentation.weather
 
-// commonMain/models/WeatherViewModel.kt
 import domain.weather.useCases.GetWeatherUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +25,7 @@ class WeatherViewModel(
     }
 
     override fun onCleared() {
-//        log.v("Clearing WeatherViewModel")
+        println("Clearing WeatherViewModel")
     }
 
     suspend fun searchWeather(cityName: String) {
@@ -59,7 +58,7 @@ class WeatherViewModel(
     }
 
     private fun handleWeatherError(throwable: Throwable) {
-//        log.e(throwable) { "Error getting weather data" }
+
         mutableWeatherState.update {
             WeatherViewState.Error(
                 error = throwable.message ?: "Unknown error occurred"

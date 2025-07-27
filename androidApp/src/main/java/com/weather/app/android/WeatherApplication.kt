@@ -1,4 +1,3 @@
-// androidApp/src/main/kotlin/com/weather/app/android/WeatherApplication.kt
 package com.weather.app.android
 
 import android.app.Application
@@ -17,7 +16,7 @@ class WeatherApplication : Application() {
             module {
                 single<Context> { this@WeatherApplication }
 
-                // ViewModel sin logger
+
                 viewModel { WeatherViewModel(get()) }
 
                 single<SharedPreferences> {
