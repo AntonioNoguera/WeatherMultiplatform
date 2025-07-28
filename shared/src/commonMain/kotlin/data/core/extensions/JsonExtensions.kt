@@ -14,7 +14,7 @@ fun JsonObject.getStringOrNull(key: String): String? {
 
 fun JsonObject.getRequiredString(key: String, fieldName: String = key): String {
     return getStringOrNull(key)
-        ?: throw DeserializationException("$fieldName is required but was missing or null")
+        ?: throw DeserializationException("$fieldName! is required but was missing or null")
 }
 
 fun String.validateNotEmpty(fieldName: String): String {

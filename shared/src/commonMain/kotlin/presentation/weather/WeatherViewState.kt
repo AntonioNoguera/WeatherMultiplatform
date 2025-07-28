@@ -2,25 +2,10 @@ package presentation.weather
 
 import co.touchlab.skie.configuration.annotations.DefaultArgumentInterop
 import domain.weather.models.Weather
+import presentation.core.ViewState
 
-sealed class WeatherViewState {
-    abstract val isLoading: Boolean
-
-    data object Initial : WeatherViewState() {
-        override val isLoading: Boolean = false
-    }
-
-    data class Loading @DefaultArgumentInterop.Enabled constructor(
-        override val isLoading: Boolean = true
-    ) : WeatherViewState()
-
-    data class Success @DefaultArgumentInterop.Enabled constructor(
-        val weather: Weather,
-        override val isLoading: Boolean = false
-    ) : WeatherViewState()
-
-    data class Error @DefaultArgumentInterop.Enabled constructor(
-        val error: String,
-        override val isLoading: Boolean = false
-    ) : WeatherViewState()
-}
+data class WeatherViewState(
+    val currentWeather: ViewState<Weather> = ViewState.Initial,
+    val forecast: ViewState<List<Weather>> = ViewState.Initial,
+    val isRefreshing: Boolean = false
+)

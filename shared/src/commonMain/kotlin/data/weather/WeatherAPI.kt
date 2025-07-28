@@ -18,7 +18,7 @@ import kotlinx.serialization.json.Json
   * API Client [ HttpClientEngine propio para multiplataforma ]
   */
 class WeatherAPI(engine: HttpClientEngine) {
- private val apiKey = "02be332837e16e0b93a5173d98a9f6cb"
+ private val apiKey = "361f9d5c91955f40cf9e4ad53655e178"
  private val baseUrl = "https://api.openweathermap.org/data/2.5"
 
  private val client = HttpClient(engine) {
@@ -62,17 +62,19 @@ class WeatherAPI(engine: HttpClientEngine) {
  /**
   * Obtiene pronóstico
   */
- suspend fun getForecast(cityName: String, days: Int = 5): List<Weather> {
+ suspend fun getForecast(cityName: String, days: Int = 5): List<WeatherResponse> {
+
+     println("FETCH FORECAST: $cityName")
+
      val jsonResponse = client.get("$baseUrl/forecast") {
          parameter("q", cityName)
          parameter("appid", apiKey)
-         parameter("units", "metric")
-         parameter("lang", "es")
-         parameter("cnt", days * 8)
+
+         println("➡️ URL construida: ${url.buildString()}")
+
      }.bodyAsText()
 
      return deserializer.deserializeForecastResponse(jsonResponse)
-         .map { it.toDomain() }
  }
 
  /**

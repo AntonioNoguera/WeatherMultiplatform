@@ -11,5 +11,5 @@ actual val platformModule: Module = module {
     single { OkHttp.create() }
 
     // ViewModel
-    single { WeatherViewModel(get()) }
+    single { WeatherViewModel(get(), get()) }
 }

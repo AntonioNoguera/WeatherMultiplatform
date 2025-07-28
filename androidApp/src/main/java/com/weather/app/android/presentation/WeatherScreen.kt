@@ -13,19 +13,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.weather.app.android.presentation.components.ErrorCard
+import com.weather.app.android.presentation.components.ForecastCard
+import com.weather.app.android.presentation.components.ForecastList
+import com.weather.app.android.presentation.components.WeatherCard
 import domain.weather.models.Weather
 import presentation.weather.WeatherViewState
 import presentation.weather.WeatherViewModel
 import org.koin.compose.koinInject
 import kotlinx.coroutines.launch
+import presentation.core.ViewState
 
 @Composable
 fun WeatherScreen() {
     val viewModel: WeatherViewModel = koinInject()
-    val uiState by viewModel.weatherState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
-    // Activar el ViewModel cuando se monte el composable
     LaunchedEffect(viewModel) {
         viewModel.activate()
     }
@@ -34,10 +38,15 @@ fun WeatherScreen() {
         uiState = uiState,
         onSearchWeather = { cityName ->
             scope.launch {
-                viewModel.searchWeather(cityName)
+                viewModel.fetchWeather(cityName)
+            }
+
+            scope.launch {
+                viewModel.fetchForecast(cityName)
             }
         },
-        onClearError = viewModel::clearError
+        onClearError = viewModel::clearWeatherError,
+        onClearForecastError = viewModel::clearForecastError
     )
 }
 
@@ -45,7 +54,8 @@ fun WeatherScreen() {
 fun WeatherScreenContent(
     uiState: WeatherViewState,
     onSearchWeather: (String) -> Unit = {},
-    onClearError: () -> Unit = {}
+    onClearError: () -> Unit = {},
+    onClearForecastError: () -> Unit = {}
 ) {
     var cityInput by remember { mutableStateOf("") }
 
@@ -79,10 +89,10 @@ fun WeatherScreenContent(
 
         Button(
             onClick = { onSearchWeather(cityInput.trim()) },
-            enabled = cityInput.isNotBlank() && !uiState.isLoading,
+            enabled = cityInput.isNotBlank() && !uiState.isRefreshing,
             modifier = Modifier.fillMaxWidth()
         ) {
-            if (uiState.isLoading) {
+            if (uiState.isRefreshing) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(16.dp),
                     strokeWidth = 2.dp
@@ -96,9 +106,8 @@ fun WeatherScreenContent(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Manejo de estados con sealed classes
-        when (uiState) {
-            is WeatherViewState.Initial -> {
+        when (val state = uiState.currentWeather) {
+            is ViewState.Initial -> {
                 Text(
                     text = "Ingresa el nombre de una ciudad",
                     textAlign = TextAlign.Center,
@@ -106,7 +115,7 @@ fun WeatherScreenContent(
                 )
             }
 
-            is WeatherViewState.Loading -> {
+            is ViewState.Loading -> {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -120,120 +129,43 @@ fun WeatherScreenContent(
                 }
             }
 
-            is WeatherViewState.Success -> {
-                WeatherCard(weather = uiState.weather)
+            is ViewState.Success -> {
+                WeatherCard(weather = state.data)
             }
 
-            is WeatherViewState.Error -> {
-                ErrorCard(
-                    error = uiState.error,
-                    onDismiss = onClearError
-                )
+            is ViewState.Error -> {
+                ErrorCard(error = state.error, onDismiss = onClearError)
             }
         }
-    }
-}
 
-@Composable
-fun ErrorCard(error: String, onDismiss: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+        Spacer(modifier = Modifier.height(32.dp))
+
+        when (val forecastState = uiState.forecast) {
+            is ViewState.Initial -> {
                 Text(
-                    text = "❌ Error",
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onErrorContainer
+                    text = "Aquí va el pronóstico",
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                TextButton(onClick = onDismiss) {
-                    Text("✕")
+            }
+
+            is ViewState.Loading -> {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator()
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Cargando pronóstico...")
                 }
             }
-            Text(
-                text = error,
-                color = MaterialTheme.colorScheme.onErrorContainer
-            )
-        }
-    }
-}
 
-@Composable
-fun WeatherCard(weather: Weather) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = weather.cityName,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "${weather.temperature.toInt()}°C",
-                fontSize = 48.sp,
-                fontWeight = FontWeight.Light,
-                color = MaterialTheme.colorScheme.primary
-            )
-
-            Text(
-                text = weather.description.replaceFirstChar { it.uppercase() },
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                WeatherDetail(
-                    icon = "💧",
-                    label = "Humedad",
-                    value = "${weather.humidity}%"
-                )
-                WeatherDetail(
-                    icon = "💨",
-                    label = "Viento",
-                    value = "${weather.windSpeed.toInt()} km/h"
-                )
+            is ViewState.Success -> {
+                ForecastList(forecast = forecastState.data)
             }
-        }
-    }
-}
 
-@Composable
-fun WeatherDetail(icon: String, label: String, value: String) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = icon, fontSize = 20.sp)
-        Text(
-            text = label,
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = value,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
-        )
+            is ViewState.Error -> {
+                ErrorCard(error = forecastState.error, onDismiss = onClearForecastError)
+            }
+
+        }
+
     }
 }

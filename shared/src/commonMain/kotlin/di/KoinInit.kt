@@ -10,6 +10,8 @@ import domain.weather.useCases.GetWeatherUseCase
 import data.weather.WeatherAPI
 import data.weather.respositories.WeatherRepositoryImpl
 import domain.weather.respositories.WeatherRepository
+import domain.weather.useCases.GetForecastUseCase
+import kotlin.math.sin
 
 
 fun initKoin(appModule: Module): KoinApplication {
@@ -38,6 +40,7 @@ private val coreModule = module {
 
     // Use Cases
     single { GetWeatherUseCase(get()) }
+    single { GetForecastUseCase(get()) }
 }
 
 internal inline fun <reified T> Scope.getWith(vararg params: Any?): T = get(parameters = { parametersOf(*params) })

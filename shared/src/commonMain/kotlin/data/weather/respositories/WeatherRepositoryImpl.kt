@@ -10,4 +10,9 @@ class WeatherRepositoryImpl( private val weatherApi: WeatherAPI) : WeatherReposi
         val response = weatherApi.getCurrentWeatherValidated(cityName)
         return response.toDomain()
     }
+
+    override suspend fun getForecast(cityName: String): List<Weather> {
+        val response = weatherApi.getForecast(cityName)
+        return response.map { it.toDomain()}
+    }
 }

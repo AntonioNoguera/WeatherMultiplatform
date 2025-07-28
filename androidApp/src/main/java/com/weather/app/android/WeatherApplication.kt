@@ -17,7 +17,7 @@ class WeatherApplication : Application() {
                 single<Context> { this@WeatherApplication }
 
 
-                viewModel { WeatherViewModel(get()) }
+                viewModel { WeatherViewModel(get(), get() ) }
 
                 single<SharedPreferences> {
                     get<Context>().getSharedPreferences(
