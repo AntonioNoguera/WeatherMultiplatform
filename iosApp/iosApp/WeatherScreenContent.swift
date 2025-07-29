@@ -11,7 +11,7 @@ import shared
 
 
 struct WeatherScreenContent: View {
-    var state: WeatherViewState
+    var state: WeatherViewStateInterop
     var onSearchWeather: (String) -> Void
     var onClearError: () -> Void
     
@@ -36,7 +36,7 @@ struct WeatherScreenContent: View {
                 }
             }) {
                 HStack {
-                    if state.isLoading {
+                    if state.isRefreshing {
                         ProgressView()
                             .scaleEffect(0.8)
                         Text("Buscando...")
@@ -50,7 +50,7 @@ struct WeatherScreenContent: View {
                 .foregroundColor(.white)
                 .cornerRadius(10)
             }
-            .disabled(cityInput.trimmingCharacters(in: .whitespaces).isEmpty || state.isLoading)
+            .disabled(cityInput.trimmingCharacters(in: .whitespaces).isEmpty || state.isRefreshing)
             .padding(.horizontal)
             
             Spacer()
@@ -64,27 +64,34 @@ struct WeatherScreenContent: View {
     
     var weatherContent: some View {
         Group {
-            switch onEnum(of: state) {
-            case .initial:
+            switch state.currentWeather {
+            case is WeatherViewDataState.Initial:
                 Text("Ingresa el nombre de una ciudad")
                     .foregroundColor(.gray)
-            case .loading:
+
+            case is WeatherViewDataState.Loading:
                 VStack {
                     ProgressView()
                     Text("Buscando información del clima...")
                         .foregroundColor(.gray)
                 }
-            case .success(let success):
+
+            case let success as WeatherViewDataState.Success:
                 WeatherCard(weather: success.weather)
-            case .error(let error):
+
+            case let error as WeatherViewDataState.Error:
                 ErrorCard(error: error.error, onDismiss: onClearError)
+
+            default:
+                EmptyView()
             }
+
         }
     }
 }
 
 struct WeatherCard: View {
-    var weather: Weather
+    var weather: WeatherModel
     
     var body: some View {
         VStack(spacing: 16) {

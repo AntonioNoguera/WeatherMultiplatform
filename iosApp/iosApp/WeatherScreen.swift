@@ -5,47 +5,26 @@
 //  Created by MICHAEL NOGUERA GUZMAN on 25/07/25.
 //  Copyright © 2025 orgName. All rights reserved.
 //
- 
+
 import SwiftUI
 import shared
 
 struct WeatherScreen: View {
 
-    @State
-    var viewModel: WeatherViewModel?
-
-    @State
-    var weatherState: WeatherViewState = .Initial.shared
+    @StateObject
+    private var viewModel = WeatherViewModelWrapper()
 
     var body: some View {
         WeatherScreenContent(
-            state: weatherState,
+            state: viewModel.uiState,
             onSearchWeather: { cityName in
-                Task {
-                    try? await viewModel?.searchWeather(cityName: cityName)
-                }
+                viewModel.fetchWeather(city: cityName)
+                viewModel.fetchForecast(city: cityName)
             },
             onClearError: {
-                viewModel?.clearError()
+                viewModel.clearWeatherError()
+                viewModel.clearForecastError()
             }
         )
-        .task {
-            let viewModel = KotlinDependencies.shared.getWeatherViewModel()
-            await withTaskCancellationHandler(
-                operation: {
-                    self.viewModel = viewModel
-                    Task {
-                        try? await viewModel.activate()
-                    }
-                    for await weatherState in viewModel.weatherState {
-                        self.weatherState = weatherState
-                    }
-                },
-                onCancel: {
-                    viewModel.clear()
-                    self.viewModel = nil
-                }
-            )
-        }
     }
 }

@@ -1,11 +1,10 @@
 package presentation.weather
 
-import domain.weather.useCases.GetForecastUseCase
+import domain.forecast.models.ForecastModel
 import domain.forecast.useCases.GetWeatherUseCase
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import domain.weather.models.WeatherModel
+import domain.weather.useCases.GetForecastUseCase
+import kotlinx.coroutines.flow.*
 import presentation.core.ViewModel
 import presentation.core.ViewState
 
@@ -17,16 +16,38 @@ class WeatherViewModel(
     private val _uiState = MutableStateFlow(WeatherViewState())
     val uiState: StateFlow<WeatherViewState> = _uiState.asStateFlow()
 
+    val uiStateInterop: StateFlow<WeatherViewStateInterop> = uiState
+        .map { state ->
+            WeatherViewStateInterop(
+                currentWeather = WeatherViewDataState.from(state.currentWeather),
+                forecast = ForecastViewDataState.from(state.forecast),
+                isRefreshing = state.isRefreshing
+            )
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = WeatherViewStateInterop(
+                currentWeather = WeatherViewDataState.Initial,
+                forecast = ForecastViewDataState.Initial,
+                isRefreshing = false
+            )
+        )
+
     suspend fun fetchWeather(city: String) {
         _uiState.update { it.copy(currentWeather = ViewState.Loading()) }
         try {
             getWeatherUseCase(city).onSuccess { weather ->
                 _uiState.update { it.copy(currentWeather = ViewState.Success(weather)) }
             }.onFailure { exception ->
-                _uiState.update { it.copy(currentWeather = ViewState.Error(exception.message ?: "Error")) }
+                _uiState.update {
+                    it.copy(currentWeather = ViewState.Error(exception.message ?: "Error"))
+                }
             }
         } catch (e: Exception) {
-            _uiState.update { it.copy(currentWeather = ViewState.Error(e.message ?: "Error")) }
+            _uiState.update {
+                it.copy(currentWeather = ViewState.Error(e.message ?: "Error"))
+            }
         }
     }
 
@@ -36,10 +57,14 @@ class WeatherViewModel(
             getForecastUseCase(city).onSuccess { forecast ->
                 _uiState.update { it.copy(forecast = ViewState.Success(forecast)) }
             }.onFailure { exception ->
-                _uiState.update { it.copy(forecast = ViewState.Error(exception.message ?: "Error")) }
+                _uiState.update {
+                    it.copy(forecast = ViewState.Error(exception.message ?: "Error"))
+                }
             }
         } catch (e: Exception) {
-            _uiState.update { it.copy(forecast = ViewState.Error(e.message ?: "Error")) }
+            _uiState.update {
+                it.copy(forecast = ViewState.Error(e.message ?: "Error"))
+            }
         }
     }
 
@@ -67,3 +92,5 @@ class WeatherViewModel(
         // Lógica inicial si aplica
     }
 }
+
+

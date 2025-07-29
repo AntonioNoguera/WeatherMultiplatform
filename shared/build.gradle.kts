@@ -60,7 +60,11 @@ kotlin {
 
             // SKIE annotations
             implementation("co.touchlab.skie:configuration-annotations:0.10.1")
- }
+
+            //String extensions
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+
+        }
 
         androidMain.dependencies {
             // Networking Android

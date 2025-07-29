@@ -1,6 +1,7 @@
 package data.forecast.dto
 
 import domain.forecast.models.ForecastModel
+import presentation.extensions.toUserFriendlyDate
 
 class ForecastDTO (
     val temperature: Double,
@@ -13,7 +14,7 @@ class ForecastDTO (
             temperature = temperature,
             humidity = humidity,
             description = description,
-            timeStamp = timeStamp
+            timeStamp = timeStamp.toUserFriendlyDate()
         )
     }
 }

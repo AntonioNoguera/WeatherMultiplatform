@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
+		A95416AC2E39834B00F434D9 /* WeatherViewModelWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A95416AB2E39834500F434D9 /* WeatherViewModelWrapper.swift */; };
 		A9B6D29D2E337328008C438A /* KoinApplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B6D29C2E337324008C438A /* KoinApplication.swift */; };
 		A9B6D29F2E337390008C438A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B6D29E2E33738C008C438A /* AppDelegate.swift */; };
 		A9B6D2A12E3373BF008C438A /* WeatherScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B6D2A02E3373BB008C438A /* WeatherScreen.swift */; };
@@ -33,6 +34,7 @@
 		058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A95416AB2E39834500F434D9 /* WeatherViewModelWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewModelWrapper.swift; sourceTree = "<group>"; };
 		A9B6D29C2E337324008C438A /* KoinApplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KoinApplication.swift; sourceTree = "<group>"; };
 		A9B6D29E2E33738C008C438A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A9B6D2A02E3373BB008C438A /* WeatherScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherScreen.swift; sourceTree = "<group>"; };
@@ -78,6 +80,7 @@
 		7555FF7D242A565900829871 /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
+				A95416AB2E39834500F434D9 /* WeatherViewModelWrapper.swift */,
 				A9B6D2A22E3373E4008C438A /* WeatherScreenContent.swift */,
 				A9B6D2A02E3373BB008C438A /* WeatherScreen.swift */,
 				A9B6D29E2E33738C008C438A /* AppDelegate.swift */,
@@ -189,6 +192,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A9B6D29F2E337390008C438A /* AppDelegate.swift in Sources */,
+				A95416AC2E39834B00F434D9 /* WeatherViewModelWrapper.swift in Sources */,
 				A9B6D2A12E3373BF008C438A /* WeatherScreen.swift in Sources */,
 				A9B6D29D2E337328008C438A /* KoinApplication.swift in Sources */,
 				A9B6D2A32E3373ED008C438A /* WeatherScreenContent.swift in Sources */,

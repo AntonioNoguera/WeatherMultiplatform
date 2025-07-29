@@ -84,56 +84,13 @@ class WeatherDeserializer : BaseDeserializer<WeatherDTO, WeatherModel>() {
     }
 
     private fun deserializeWindData(jsonObject: JsonObject): WindDataDTO {
-        // Wind data es opcional, usar objeto vacío si no existe
         val windObj = jsonObject.getObjectOrNull("wind") ?: JsonObject(emptyMap())
 
-        val speed = windObj.getDoubleOrNull("speed")
-            ?.validatePositive("Wind speed") ?: 0.0
+        val speed = windObj.getDoubleOrNull("speed") ?.validatePositive("Wind speed") ?: 0.0
 
         return WindDataDTO(speed = speed)
     }
 
-    /**
-     * Método adicional para deserializar respuestas de forecast
-     */
-    fun deserializeForecastResponse(jsonString: String): List<ForecastDTO> {
-        print("Deserializing weather forecast JSON")
-
-        val jsonObject = safeParseJson(jsonString)
-            ?: throw DeserializationException("Invalid forecast JSON format")
-
-
-        println("")
-
-        val listArray = jsonObject.getRequiredArray("list", "Forecast list")
-
-        println("")
-        return listArray.map { element ->
-            deserializeForecast(element.jsonObject)
-        }
-    }
-
-    fun deserializeForecast (jsonObject: JsonObject) : ForecastDTO {
-
-
-        val main :JsonObject = jsonObject.getObjectOrNull("main") ?: JsonObject(emptyMap())
-
-
-        val currentWeather : JsonArray = jsonObject.getRequiredArray("weather")
-
-        val currentDescription : List<String> = currentWeather.map { it -> it.jsonObject.getStringOrNull("description") ?: "" }
-
-        return ForecastDTO(
-            temperature = main.getRequiredDouble("temp_max"),
-            humidity = main.getRequiredDouble("humidity"),
-            description = currentDescription.first(),
-            timeStamp = jsonObject.getStringOrNull("dt_txt") ?: ""
-        )
-    }
-
-    /**
-     * Método para deserializar respuestas con coordenadas
-     */
     fun deserializeWeatherWithCoordinates(jsonString: String): Pair<WeatherDTO, Coordinates> {
         val weatherResponse = deserializeWithValidation(jsonString)
 

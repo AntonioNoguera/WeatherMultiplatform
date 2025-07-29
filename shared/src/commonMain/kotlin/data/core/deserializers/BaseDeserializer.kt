@@ -21,7 +21,7 @@ abstract class BaseDeserializer<DTO : Any, DOMAIN : Any> {
     abstract fun deserialize(jsonString: String): DTO
 
     /**
-     * Deserialización con validaciones personalizadas
+     * Deserialización con validaciones personalizadas [Me gustaría definir el método de listas y objetos tmb]
      */
     abstract fun deserializeWithValidation(jsonString: String): DTO
 

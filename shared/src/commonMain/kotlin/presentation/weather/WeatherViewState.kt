@@ -1,8 +1,9 @@
 package presentation.weather
 
-import domain.forecast.models.ForecastModel
 import domain.weather.models.WeatherModel
+import domain.forecast.models.ForecastModel
 import presentation.core.ViewState
+
 
 data class WeatherViewState(
     val currentWeather: ViewState<WeatherModel> = ViewState.Initial,
