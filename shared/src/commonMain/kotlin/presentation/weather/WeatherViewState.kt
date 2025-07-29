@@ -1,11 +1,11 @@
 package presentation.weather
 
-import co.touchlab.skie.configuration.annotations.DefaultArgumentInterop
-import domain.weather.models.Weather
+import domain.forecast.models.ForecastModel
+import domain.weather.models.WeatherModel
 import presentation.core.ViewState
 
 data class WeatherViewState(
-    val currentWeather: ViewState<Weather> = ViewState.Initial,
-    val forecast: ViewState<List<Weather>> = ViewState.Initial,
+    val currentWeather: ViewState<WeatherModel> = ViewState.Initial,
+    val forecast: ViewState<List<ForecastModel>> = ViewState.Initial,
     val isRefreshing: Boolean = false
 )

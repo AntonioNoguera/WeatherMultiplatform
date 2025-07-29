@@ -17,10 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import domain.weather.models.Weather
+import domain.weather.models.WeatherModel
 
 @Composable
-fun WeatherCard(weather: Weather) {
+fun WeatherCard(weather: WeatherModel) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)

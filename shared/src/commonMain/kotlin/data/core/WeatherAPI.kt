@@ -1,10 +1,10 @@
-package data.weather
+package data.core
 
 import data.weather.deserializers.Coordinates
 import data.weather.deserializers.WeatherDeserializer
-import data.weather.dto.WeatherResponse
-import data.weather.dto.toDomain
-import domain.weather.models.Weather
+import data.forecast.dto.ForecastDTO
+import data.weather.dto.WeatherDTO
+import domain.weather.models.WeatherModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.request.*
@@ -45,15 +45,16 @@ class WeatherAPI(engine: HttpClientEngine) {
  /**
   * Validaciones personalizadas
   */
- suspend fun getCurrentWeatherValidated(cityName: String): WeatherResponse {
+ suspend fun getCurrentWeatherValidated(cityName: String): WeatherDTO {
      val jsonResponse = makeWeatherRequest(cityName)
+
      return deserializer.deserializeWithValidation(jsonResponse)
  }
 
  /**
   * Clima con coordenadas
   */
- suspend fun getCurrentWeatherWithCoordinates(cityName: String): Pair<Weather, Coordinates> {
+ suspend fun getCurrentWeatherWithCoordinates(cityName: String): Pair<WeatherModel, Coordinates> {
      val jsonResponse = makeWeatherRequest(cityName)
      val (weatherResponse, coordinates) = deserializer.deserializeWeatherWithCoordinates(jsonResponse)
      return weatherResponse.toDomain() to coordinates
@@ -62,19 +63,22 @@ class WeatherAPI(engine: HttpClientEngine) {
  /**
   * Obtiene pronóstico
   */
- suspend fun getForecast(cityName: String, days: Int = 5): List<WeatherResponse> {
-
-     println("FETCH FORECAST: $cityName")
+ suspend fun getForecast(cityName: String, days: Int = 5): List<ForecastDTO> {
 
      val jsonResponse = client.get("$baseUrl/forecast") {
          parameter("q", cityName)
          parameter("appid", apiKey)
+         parameter("units", "metric")
+         parameter("lang", "es")
 
          println("➡️ URL construida: ${url.buildString()}")
 
      }.bodyAsText()
 
-     return deserializer.deserializeForecastResponse(jsonResponse)
+     val deserialize = deserializer.deserializeForecastResponse(jsonResponse)
+
+
+     return deserialize
  }
 
  /**
@@ -86,18 +90,20 @@ class WeatherAPI(engine: HttpClientEngine) {
          parameter("appid", apiKey)
          parameter("units", "metric")
          parameter("lang", "es")
+
+
+         println("➡️ URL construida: ${url.buildString()}")
      }.bodyAsText()
  }
 
  /**
   * Obtener weather por coordenadas
   */
- suspend fun getCurrentWeatherByCoordinates(lat: Double, lon: Double): WeatherResponse {
+ suspend fun getCurrentWeatherByCoordinates(lat: Double, lon: Double): WeatherDTO {
      val jsonResponse = client.get("$baseUrl/weather") {
          parameter("lat", lat)
          parameter("lon", lon)
          parameter("appid", apiKey)
-         parameter("units", "metric")
          parameter("lang", "es")
      }.bodyAsText()
 

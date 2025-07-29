@@ -6,12 +6,13 @@ import org.koin.core.module.Module
 import org.koin.core.parameter.parametersOf
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
-import domain.weather.useCases.GetWeatherUseCase
-import data.weather.WeatherAPI
-import data.weather.respositories.WeatherRepositoryImpl
+import domain.forecast.useCases.GetWeatherUseCase
+import data.core.WeatherAPI
+import data.forecast.datasources.ForecastDataSource
+import data.weather.datasources.WeatherDataSource
+import domain.forecast.repositories.ForecastRepository
 import domain.weather.respositories.WeatherRepository
 import domain.weather.useCases.GetForecastUseCase
-import kotlin.math.sin
 
 
 fun initKoin(appModule: Module): KoinApplication {
@@ -36,7 +37,8 @@ private val coreModule = module {
     single { WeatherAPI(get()) }
 
     // Repository
-    single<WeatherRepository> { WeatherRepositoryImpl(get()) }
+    single<WeatherRepository> { WeatherDataSource(get()) }
+    single<ForecastRepository> { ForecastDataSource(get()) }
 
     // Use Cases
     single { GetWeatherUseCase(get()) }

@@ -12,7 +12,7 @@ actual val platformModule: Module = module {
     single { Darwin.create() }
 
     // ViewModel
-    single { WeatherViewModel(get()) }
+    single { WeatherViewModel(get(), get()) }
 }
 
 @Suppress("unused")

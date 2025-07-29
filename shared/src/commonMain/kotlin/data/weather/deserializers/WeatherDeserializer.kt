@@ -14,31 +14,31 @@ import data.core.extensions.getStringOrNull
 import data.core.extensions.validateInRange
 import data.core.extensions.validateNotEmpty
 import data.core.extensions.validatePositive
-import data.weather.dto.MainData
-import data.weather.dto.WeatherData
-import data.weather.dto.WeatherResponse
-import data.weather.dto.WindData
-import data.weather.dto.toDomain
-import domain.weather.models.Weather
+import data.forecast.dto.ForecastDTO
+import data.weather.dto.MainDataDTO
+import data.weather.dto.WeatherDTO
+import data.weather.dto.WeatherDataDTO
+import data.weather.dto.WindDataDTO
+import domain.weather.models.WeatherModel
 import kotlinx.serialization.json.*
 
 /**
  * Deserializador específico para Weather API
  */
-class WeatherDeserializer : BaseDeserializer<WeatherResponse, Weather>() {
+class WeatherDeserializer : BaseDeserializer<WeatherDTO, WeatherModel>() {
 
-    override fun deserialize(jsonString: String): WeatherResponse {
+    override fun deserialize(jsonString: String): WeatherDTO {
         println("Deserializing weather JSON to DTO using automatic serialization")
-        return json.decodeFromString<WeatherResponse>(jsonString)
+        return json.decodeFromString<WeatherDTO>(jsonString)
     }
 
-    override fun deserializeWithValidation(jsonString: String): WeatherResponse {
+    override fun deserializeWithValidation(jsonString: String): WeatherDTO {
         println("Deserializing weather JSON with custom validation")
 
         val jsonObject = safeParseJson(jsonString)
             ?: throw DeserializationException("Invalid JSON format")
 
-        return WeatherResponse(
+        return WeatherDTO(
             name = deserializeCityName(jsonObject),
             main = deserializeMainData(jsonObject),
             weather = deserializeWeatherList(jsonObject),
@@ -52,7 +52,7 @@ class WeatherDeserializer : BaseDeserializer<WeatherResponse, Weather>() {
             .trim()
     }
 
-    private fun deserializeMainData(jsonObject: JsonObject): MainData {
+    private fun deserializeMainData(jsonObject: JsonObject): MainDataDTO {
         val mainObj = jsonObject.getRequiredObject("main", "Main weather data")
 
         val temperature = mainObj.getRequiredDouble("temp", "Temperature")
@@ -61,13 +61,13 @@ class WeatherDeserializer : BaseDeserializer<WeatherResponse, Weather>() {
         val humidity = mainObj.getRequiredInt("humidity", "Humidity")
             .validateInRange(0, 100, "Humidity")
 
-        return MainData(
+        return MainDataDTO(
             temp = temperature,
             humidity = humidity
         )
     }
 
-    private fun deserializeWeatherList(jsonObject: JsonObject): List<WeatherData> {
+    private fun deserializeWeatherList(jsonObject: JsonObject): List<WeatherDataDTO> {
         val weatherArray = jsonObject.getRequiredArray("weather", "Weather conditions")
 
         if (weatherArray.isEmpty()) {
@@ -76,43 +76,65 @@ class WeatherDeserializer : BaseDeserializer<WeatherResponse, Weather>() {
 
         return weatherArray.map { element ->
             val weatherObj = element.jsonObject
-            WeatherData(
+            WeatherDataDTO(
                 main = weatherObj.getStringOrNull("main").orEmpty(),
                 description = weatherObj.getStringOrNull("description").orEmpty()
             )
         }
     }
 
-    private fun deserializeWindData(jsonObject: JsonObject): WindData {
+    private fun deserializeWindData(jsonObject: JsonObject): WindDataDTO {
         // Wind data es opcional, usar objeto vacío si no existe
         val windObj = jsonObject.getObjectOrNull("wind") ?: JsonObject(emptyMap())
 
         val speed = windObj.getDoubleOrNull("speed")
             ?.validatePositive("Wind speed") ?: 0.0
 
-        return WindData(speed = speed)
+        return WindDataDTO(speed = speed)
     }
 
     /**
      * Método adicional para deserializar respuestas de forecast
      */
-    fun deserializeForecastResponse(jsonString: String): List<WeatherResponse> {
+    fun deserializeForecastResponse(jsonString: String): List<ForecastDTO> {
         print("Deserializing weather forecast JSON")
 
         val jsonObject = safeParseJson(jsonString)
             ?: throw DeserializationException("Invalid forecast JSON format")
 
+
+        println("")
+
         val listArray = jsonObject.getRequiredArray("list", "Forecast list")
 
+        println("")
         return listArray.map { element ->
-            deserializeWithValidation(element.toString())
+            deserializeForecast(element.jsonObject)
         }
+    }
+
+    fun deserializeForecast (jsonObject: JsonObject) : ForecastDTO {
+
+
+        val main :JsonObject = jsonObject.getObjectOrNull("main") ?: JsonObject(emptyMap())
+
+
+        val currentWeather : JsonArray = jsonObject.getRequiredArray("weather")
+
+        val currentDescription : List<String> = currentWeather.map { it -> it.jsonObject.getStringOrNull("description") ?: "" }
+
+        return ForecastDTO(
+            temperature = main.getRequiredDouble("temp_max"),
+            humidity = main.getRequiredDouble("humidity"),
+            description = currentDescription.first(),
+            timeStamp = jsonObject.getStringOrNull("dt_txt") ?: ""
+        )
     }
 
     /**
      * Método para deserializar respuestas con coordenadas
      */
-    fun deserializeWeatherWithCoordinates(jsonString: String): Pair<WeatherResponse, Coordinates> {
+    fun deserializeWeatherWithCoordinates(jsonString: String): Pair<WeatherDTO, Coordinates> {
         val weatherResponse = deserializeWithValidation(jsonString)
 
         val jsonObject = safeParseJson(jsonString)!!

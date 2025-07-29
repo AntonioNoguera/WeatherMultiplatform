@@ -14,10 +14,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.weather.app.android.presentation.components.ErrorCard
-import com.weather.app.android.presentation.components.ForecastCard
 import com.weather.app.android.presentation.components.ForecastList
 import com.weather.app.android.presentation.components.WeatherCard
-import domain.weather.models.Weather
 import presentation.weather.WeatherViewState
 import presentation.weather.WeatherViewModel
 import org.koin.compose.koinInject
@@ -150,6 +148,7 @@ fun WeatherScreenContent(
             }
 
             is ViewState.Loading -> {
+
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     CircularProgressIndicator()
                     Spacer(modifier = Modifier.height(8.dp))
@@ -164,8 +163,6 @@ fun WeatherScreenContent(
             is ViewState.Error -> {
                 ErrorCard(error = forecastState.error, onDismiss = onClearForecastError)
             }
-
         }
-
     }
 }

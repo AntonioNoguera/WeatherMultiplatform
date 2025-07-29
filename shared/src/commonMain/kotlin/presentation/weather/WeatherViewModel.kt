@@ -1,8 +1,7 @@
 package presentation.weather
 
-import domain.weather.models.Weather
 import domain.weather.useCases.GetForecastUseCase
-import domain.weather.useCases.GetWeatherUseCase
+import domain.forecast.useCases.GetWeatherUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

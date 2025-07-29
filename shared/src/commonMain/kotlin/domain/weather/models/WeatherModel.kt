@@ -1,6 +1,6 @@
 package domain.weather.models
 
-data class Weather(
+data class WeatherModel(
     val cityName: String,
     val temperature: Double,
     val description: String,
