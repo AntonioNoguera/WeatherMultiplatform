@@ -121,6 +121,7 @@ struct WeatherCard: View {
                 )
             }
         }
+        .frame(maxWidth: .infinity)
         .padding(24)
         .background(Color(.systemBackground))
         .cornerRadius(16)
